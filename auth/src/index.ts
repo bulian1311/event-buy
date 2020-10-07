@@ -1,5 +1,6 @@
 import express from "express";
 import { json } from "body-parser";
+import mongoose from "mongoose";
 
 import { signinRouter } from "./routes/signin.route";
 import { signoutRouter } from "./routes/signout.route";
@@ -22,6 +23,21 @@ app.all("*", (req, res, next) => {
 });
 app.use(errorHandler);
 
-app.listen(4000, () => {
-  console.log("Auth listening on port 4000...");
-});
+const start = async () => {
+  try {
+    await mongoose.connect(`mongodb://auth-mongo-srv:27017/auth`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
+    console.log("Connected to mongodb...");
+  } catch (err) {
+    console.error(err);
+  }
+
+  app.listen(4000, () => {
+    console.log("Auth listening on port 4000...");
+  });
+};
+
+start();

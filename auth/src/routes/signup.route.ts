@@ -1,7 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
+import { BadRequestError } from "../errors/bad-request.error";
 import { RequestValidationError } from "../errors/request-validation.error";
-import { DatabaseConnectionError } from "../errors/db-connection.error";
+
+import { User } from "../models/user.model";
 
 const router = express.Router();
 
@@ -23,9 +25,18 @@ router.post(
 
     const { email, password } = req.body;
 
-    console.log("creating user...", email, password);
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser)
+        return next(new BadRequestError("Такой емейл уже используется."));
 
-    res.send("");
+      const user = User.build({ email, password });
+      await user.save();
+
+      res.status(201).send(user);
+    } catch (err) {
+      next(err);
+    }
   }
 );
 
