@@ -15,6 +15,12 @@ spec:
       containers:
         - name: auth
           image: bulian1311/event-buy/auth
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
 ---
 apiVersion: v1
 kind: Service
