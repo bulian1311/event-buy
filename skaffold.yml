@@ -16,3 +16,13 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: bulian1311/event-buy/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+          - src: "src/**/*.tsx"
+            dest: .
