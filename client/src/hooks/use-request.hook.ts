@@ -4,7 +4,7 @@ import { useState } from "react";
 type TProps = {
   url: string;
   method: "get" | "post" | "put" | "putch" | "delete";
-  body: {
+  body?: {
     email: string;
     password: string;
   };
