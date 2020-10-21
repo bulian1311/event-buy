@@ -8,8 +8,8 @@ import { signoutRouter } from "./routes/signout.route";
 import { signupRouter } from "./routes/signup.route";
 import { currentUserRouter } from "./routes/current-user.route";
 
-import { errorHandler } from "./middlewares/error-handler.mid";
-import { NotFoundError } from "./errors/not-found.error";
+import { errorHandler } from "@magmer/common";
+import { NotFoundError } from "@magmer/common";
 
 const app = express();
 app.set("trust proxy", true);
@@ -17,7 +17,7 @@ app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: process.env.NODE_ENV !== 'test',
+    secure: process.env.NODE_ENV !== "test",
   })
 );
 

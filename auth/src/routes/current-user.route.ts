@@ -1,5 +1,5 @@
 import express from "express";
-import { currentUser } from "../middlewares/current-user.mid";
+import { currentUser } from "@magmer/common";
 
 const router = express.Router();
 
