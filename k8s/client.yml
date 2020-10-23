@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: bulian1311/event-buy/client
+          image: bulian1311/event-buy-client
 ---
 apiVersion: v1
 kind: Service

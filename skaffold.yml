@@ -8,7 +8,7 @@ build:
   local:
     push: false
   artifacts:
-    - image: bulian1311/event-buy/auth
+    - image: bulian1311/event-buy-auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -16,7 +16,15 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: bulian1311/event-buy/client
+    - image: bulian1311/event-buy-products
+      context: products
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: bulian1311/event-buy-client
       context: client
       docker:
         dockerfile: Dockerfile

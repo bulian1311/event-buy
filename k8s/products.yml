@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: products-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: products
   template:
     metadata:
       labels:
-        app: auth
+        app: products
     spec:
       containers:
-        - name: auth
-          image: bulian1311/event-buy-auth
+        - name: products
+          image: bulian1311/event-buy-products
           env:
             - name: MONGO_URI
-              value: "mongodb://auth-mongo-srv:27017/auth"
+              value: "mongodb://products-mongo-srv:27017/products"
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
@@ -27,12 +27,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: products-srv
 spec:
   selector:
-    app: auth
+    app: products
   ports:
-    - name: auth
+    - name: products
       protocol: TCP
       port: 4000
       targetPort: 4000

@@ -11,13 +11,13 @@ const start = async () => {
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
-    console.log("Auth service connected to mongodb...");
+    console.log("Product service connected to mongodb...");
   } catch (err) {
     console.error(err);
   }
 
   app.listen(4000, () => {
-    console.log("Auth service listening on port 4000...");
+    console.log("Products service listening on port 4000...");
   });
 };
 
