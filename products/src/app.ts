@@ -3,8 +3,12 @@ import { json } from "body-parser";
 
 import cookieSession from "cookie-session";
 
-import { errorHandler } from "@magmer/common";
-import { NotFoundError } from "@magmer/common";
+import { errorHandler, NotFoundError, currentUser } from "@magmer/common";
+
+import { createProductRouter } from "./routes/create.router";
+import { readProductRouter } from "./routes/read.router";
+import { updateProductRouter } from "./routes/update.router";
+import { indexProductRouter } from "./routes/index.router";
 
 const app = express();
 app.set("trust proxy", true);
@@ -15,6 +19,13 @@ app.use(
     secure: process.env.NODE_ENV !== "test",
   })
 );
+
+app.use(currentUser);
+
+app.use(createProductRouter);
+app.use(updateProductRouter);
+app.use(readProductRouter);
+app.use(indexProductRouter);
 
 app.all("*", (req, res, next) => {
   next(new NotFoundError());
