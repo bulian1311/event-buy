@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app } from "../../app";
 import { Product } from "../../models/product.model";
+import { natsWrapper } from "../../nats-wrapper";
 
 it("Роутер слушает api/products для POST запроса.", async () => {
   const response = await request(app).post("/api/products").send({});
@@ -75,4 +76,17 @@ it("Создает продукт с необходимыми параметра
   products = await Product.find({});
   expect(products.length).toEqual(1);
   expect(products[0].title).toEqual("Test product");
+});
+
+it("Публикует событие в NATS.", async () => {
+  await request(app)
+    .post("/api/products")
+    .set("Cookie", global.signin())
+    .send({
+      title: "Test product",
+      price: 123,
+    })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });

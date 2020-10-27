@@ -2,6 +2,7 @@ import request from "supertest";
 import { app } from "../../app";
 import mongoose from "mongoose";
 import { createProduct } from "../../test/create-product.helper";
+import { natsWrapper } from "../../nats-wrapper";
 
 it("Возврощает 404 если id не существует.", async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
@@ -67,4 +68,21 @@ it("Редактирует продукт по id.", async () => {
 
   expect(response2.body.title).toEqual("changed");
   expect(response2.body.price).toEqual(777);
+});
+
+it("Публикует событие в NATS.", async () => {
+  const cookie = global.signin();
+
+  const response1 = await request(app)
+    .post(`/api/products`)
+    .set("Cookie", cookie)
+    .send({ title: "test", price: 333 });
+
+  const response2 = await request(app)
+    .put(`/api/products/${response1.body.id}`)
+    .set("Cookie", cookie)
+    .send({ title: "changed", price: 777 })
+    .expect(200);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });

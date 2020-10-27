@@ -6,8 +6,10 @@ import {
   NotAuthError,
 } from "@magmer/common";
 import { body } from "express-validator";
+
 import { Product } from "../models/product.model";
-import { isNamedExportBindings } from "typescript";
+import { ProductUpdatePublisher } from "../events/publishers/product-update.publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
 
@@ -34,6 +36,13 @@ router.put(
 
     product.set({ title, price });
     await product.save();
+
+    new ProductUpdatePublisher(natsWrapper.client).publish({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      userId: product.userId,
+    });
 
     res.send(product);
   }
