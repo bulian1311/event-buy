@@ -18,6 +18,10 @@ spec:
             backend:
               serviceName: products-srv
               servicePort: 4000
+          - path: /api/orders/?(.*)
+            backend:
+              serviceName: orders-srv
+              servicePort: 4000
           - path: /?(.*)
             backend:
               serviceName: client-srv
