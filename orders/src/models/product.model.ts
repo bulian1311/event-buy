@@ -3,6 +3,7 @@ import { OrderStatus } from "@magmer/common";
 import { Order } from "../models/order.model";
 
 export interface IProductAttrs {
+  id: string;
   title: string;
   price: number;
 }
@@ -40,7 +41,11 @@ const productScheema = new mongoose.Schema(
 );
 
 productScheema.statics.build = (attrs: IProductAttrs) => {
-  return new Product(attrs);
+  return new Product({
+    _id: attrs.id,
+    title: attrs.title,
+    price: attrs.price,
+  });
 };
 
 productScheema.methods.isReserved = async function () {

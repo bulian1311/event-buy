@@ -4,7 +4,10 @@ import { OrderStatus } from "@magmer/common";
 
 import { app } from "../../app";
 import { Order } from "../../models/order.model";
-import { Product } from "../../models/product.model";
+
+import { createProduct } from "../../test/create-product.helper";
+
+import { natsWrapper } from "../../nats-wrapper";
 
 it("Возвращает ошибку, если продукта не существует.", async () => {
   const productId = mongoose.Types.ObjectId();
@@ -17,8 +20,7 @@ it("Возвращает ошибку, если продукта не сущес
 });
 
 it("Возвращает ошибку, если продукт зарезервирован.", async () => {
-  const product = Product.build({ title: "Test product", price: 123 });
-  await product.save();
+  const product = await createProduct();
 
   const order = Order.build({
     product,
@@ -36,8 +38,7 @@ it("Возвращает ошибку, если продукт зарезерв�
 });
 
 it("Резервирует продукт.", async () => {
-  const product = Product.build({ title: "Test product", price: 123 });
-  await product.save();
+  const product = await createProduct();
 
   await request(app)
     .post("/api/orders")
@@ -46,4 +47,14 @@ it("Резервирует продукт.", async () => {
     .expect(201);
 });
 
-it.todo("Излучитиь событие о создании заказа");
+it("Излучитиь событие о создании заказа", async () => {
+  const product = await createProduct();
+
+  await request(app)
+    .post("/api/orders")
+    .set("Cookie", global.signin())
+    .send({ productId: product.id })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+});

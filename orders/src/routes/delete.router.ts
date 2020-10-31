@@ -8,6 +8,9 @@ import {
 
 import { Order } from "../models/order.model";
 
+import { OrderCancelledPublisher } from "../events/publishers/order-cancelled-publisher";
+import { natsWrapper } from "../nats-wrapper";
+
 const router = express.Router();
 
 router.delete(
@@ -15,7 +18,7 @@ router.delete(
   requireAuth,
   async (req: Request, res: Response, next: NextFunction) => {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("product");
 
     if (!order) return next(new NotFoundError());
 
@@ -25,6 +28,13 @@ router.delete(
 
     order.status = OrderStatus.Canceled;
     await order.save();
+
+    new OrderCancelledPublisher(natsWrapper.client).publish({
+      id: order.id,
+      product: {
+        id: order.product.id,
+      },
+    });
 
     res.status(204).send(order);
   }
