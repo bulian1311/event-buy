@@ -4,6 +4,7 @@ import {
   validateRequest,
   NotFoundError,
   NotAuthError,
+  BadRequestError,
 } from "@magmer/common";
 import { body } from "express-validator";
 
@@ -32,6 +33,10 @@ router.put(
 
     if (!product) return next(new NotFoundError());
 
+    if (product.orderId) {
+      return next(new BadRequestError("Продукт уже в резерве."));
+    }
+
     if (product.userId !== req.currentUser!.id) return next(new NotAuthError());
 
     product.set({ title, price });
@@ -39,6 +44,7 @@ router.put(
 
     new ProductUpdatePublisher(natsWrapper.client).publish({
       id: product.id,
+      version: product.version,
       title: product.title,
       price: product.price,
       userId: product.userId,

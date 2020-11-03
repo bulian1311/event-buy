@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { OrderStatus } from "@magmer/common";
 import { Order } from "../models/order.model";
 
@@ -9,6 +10,7 @@ export interface IProductAttrs {
 }
 
 export interface IProductDoc extends mongoose.Document {
+  version: number;
   title: string;
   price: number;
   isReserved(): Promise<boolean>;
@@ -16,9 +18,13 @@ export interface IProductDoc extends mongoose.Document {
 
 export interface IProductModel extends mongoose.Model<IProductDoc> {
   build(attrs: IProductAttrs): IProductDoc;
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<IProductDoc | null>;
 }
 
-const productScheema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -40,7 +46,10 @@ const productScheema = new mongoose.Schema(
   }
 );
 
-productScheema.statics.build = (attrs: IProductAttrs) => {
+productSchema.set("versionKey", "version");
+productSchema.plugin(updateIfCurrentPlugin);
+
+productSchema.statics.build = (attrs: IProductAttrs) => {
   return new Product({
     _id: attrs.id,
     title: attrs.title,
@@ -48,7 +57,17 @@ productScheema.statics.build = (attrs: IProductAttrs) => {
   });
 };
 
-productScheema.methods.isReserved = async function () {
+productSchema.statics.findByEvent = (event: {
+  id: string;
+  version: number;
+}) => {
+  return Product.findOne({
+    _id: event.id,
+    version: event.version - 1,
+  });
+};
+
+productSchema.methods.isReserved = async function () {
   const existingOrder = await Order.findOne({
     product: this,
     status: {
@@ -65,7 +84,7 @@ productScheema.methods.isReserved = async function () {
 
 const Product = mongoose.model<IProductDoc, IProductModel>(
   "Product",
-  productScheema
+  productSchema
 );
 
 export { Product };

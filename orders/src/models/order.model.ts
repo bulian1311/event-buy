@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { OrderStatus } from "@magmer/common";
 
 import { IProductDoc } from "./product.model";
@@ -11,6 +12,7 @@ export interface IOrderAttrs {
 }
 
 interface IOrderDoc extends mongoose.Document {
+  version: number;
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
@@ -50,6 +52,9 @@ const orderSchema = new mongoose.Schema(
     },
   }
 );
+
+orderSchema.set("versionKey", "version");
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: IOrderAttrs) => {
   return new Order(attrs);

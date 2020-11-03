@@ -3,6 +3,7 @@ import { app } from "../../app";
 import mongoose from "mongoose";
 import { createProduct } from "../../test/create-product.helper";
 import { natsWrapper } from "../../nats-wrapper";
+import { Product } from "../../models/product.model";
 
 it("Возврощает 404 если id не существует.", async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
@@ -85,4 +86,23 @@ it("Публикует событие в NATS.", async () => {
     .expect(200);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+});
+
+it("Отклоняет запрос, если продукт в резерве.", async () => {
+  const cookie = global.signin();
+
+  const response = await request(app)
+    .post(`/api/products`)
+    .set("Cookie", cookie)
+    .send({ title: "test", price: 333 });
+
+  const product = await Product.findById(response.body.id);
+  product!.set({ orderId: mongoose.Types.ObjectId().toHexString() });
+  await product!.save();
+
+  await request(app)
+    .put(`/api/products/${response.body.id}`)
+    .set("Cookie", cookie)
+    .send({ title: "", price: 333 })
+    .expect(400);
 });

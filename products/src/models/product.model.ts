@@ -12,6 +12,7 @@ interface IProductDoc extends mongoose.Document {
   price: number;
   userId: string;
   version: number;
+  orderId?: string;
 }
 
 interface IProductModel extends mongoose.Model<IProductDoc> {
@@ -31,6 +32,9 @@ const productScheema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+    },
+    orderId: {
+      type: String,
     },
   },
   {
