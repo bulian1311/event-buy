@@ -42,3 +42,11 @@ build:
             dest: .
           - src: "src/**/*.tsx"
             dest: .
+    - image: bulian1311/event-buy-expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

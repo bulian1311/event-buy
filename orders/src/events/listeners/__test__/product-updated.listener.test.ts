@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Message } from "node-nats-streaming";
 import { ProductUpdatedEvent } from "@magmer/common";
-import { ProductUpdatedListener } from "../product-updated-listener";
+import { ProductUpdatedListener } from "../product-updated.listener";
 import { natsWrapper } from "../../../nats-wrapper";
 import { Product } from "../../../models/product.model";
 

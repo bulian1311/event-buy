@@ -26,7 +26,7 @@ router.delete(
       return next(new NotAuthError());
     }
 
-    order.status = OrderStatus.Canceled;
+    order.status = OrderStatus.Cancelled;
     await order.save();
 
     new OrderCancelledPublisher(natsWrapper.client).publish({

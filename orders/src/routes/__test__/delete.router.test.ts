@@ -26,7 +26,7 @@ it("Помечает заказ как отмененный.", async () => {
 
   const updatedOrder = await Order.findById(order.id);
 
-  expect(updatedOrder!.status).toEqual(OrderStatus.Canceled);
+  expect(updatedOrder!.status).toEqual(OrderStatus.Cancelled);
 });
 
 it("Излучает сабытие отмены заказа", async () => {
